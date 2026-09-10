@@ -1,0 +1,32 @@
+{
+  "name": "reto-agente-proveedor",
+  "version": "1.0.0",
+  "description": "Agente conversacional para automatizacion de registro como proveedor",
+  "main": "src/server.ts",
+  "scripts": {
+    "build": "tsc",
+    "demo": "tsc && node dist/demo.js",
+    "start": "tsc && node dist/src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipeRodriguez99/reto-agente-proveedor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "openai": "^7.13.0",
+    "pdfkit": "^0.20.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.1"
+  }
+}

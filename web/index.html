@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agente Registro de Proveedores | Periferia IT Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #334155;
+      --accent-primary: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border-color: #475569;
+      --radius-lg: 12px;
+      --radius-md: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-title h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      background: var(--bg-card);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-success);
+      border-radius: 50%;
+    }
+
+    /* Layout principal */
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar con casos rápidos */
+    aside {
+      width: 280px;
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    aside h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .case-btn {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .case-btn:hover {
+      background-color: #475569;
+      border-color: var(--accent-primary);
+    }
+
+    .case-btn .title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .case-btn .desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Chat Container */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-primary);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .message-sender {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .message-bubble {
+      padding: 14px 18px;
+      border-radius: var(--radius-lg);
+      line-height: 1.5;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .message.user .message-bubble {
+      background-color: var(--accent-primary);
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.assistant .message-bubble {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-bottom-left-radius: 2px;
+    }
+
+    /* Tool Calls Container */
+    .tool-calls-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tool-call-item {
+      background-color: rgba(15, 23, 42, 0.6);
+      border: 1px solid #334155;
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .tool-call-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .tool-call-args {
+      color: var(--text-secondary);
+      margin-top: 4px;
+      word-break: break-all;
+    }
+
+    /* Banner de Confirmación */
+    .confirmation-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+      border: 1px solid var(--accent-warning);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .confirmation-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: var(--accent-warning);
+    }
+
+    .confirmation-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-confirm {
+      background-color: var(--accent-success);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-confirm:hover {
+      background-color: #059669;
+    }
+
+    .btn-cancel {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Thinking Indicator */
+    .thinking-indicator {
+      display: none;
+      align-self: flex-start;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 12px 18px;
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      color: var(--text-secondary);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Input Footer */
+    .chat-input-container {
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+    }
+
+    textarea {
+      flex: 1;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      height: 48px;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .send-btn {
+      background-color: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .send-btn:hover {
+      background-color: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">P</div>
+      <div class="brand-title">
+        <h1>Agente Registro de Proveedores</h1>
+        <p>Periferia IT Group · Automatización Asistida</p>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span>Agente Conectado (OpenAI gpt-4o-mini)</span>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <h2>Casos de Prueba</h2>
+
+      <button class="case-btn" onclick="selectCase('co-industrias-delta')">
+        <span class="title">CO · Industrias Delta</span>
+        <span class="desc">Colombia · Excel (.xlsx)</span>
+      </button>
+
+      <button class="case-btn" onclick="selectCase('ec-corp-andina')">
+        <span class="title">EC · Corp Andina</span>
+        <span class="desc">Ecuador · PDF (.pdf)</span>
+      </button>
+
+      <button class="case-btn" onclick="selectCase('hn-agroexport-sula')">
+        <span class="title">HN · Agroexport Sula</span>
+        <span class="desc">Honduras · Excel (Soporte vencido)</span>
+      </button>
+
+      <button class="case-btn" onclick="selectCase('pa-logistica-istmo')">
+        <span class="title">PA · Logística del Istmo</span>
+        <span class="desc">Panamá · Portal Web</span>
+      </button>
+    </aside>
+
+    <section class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+          <div class="message-sender">Agente Proveedor</div>
+          <div class="message-bubble">¡Hola! Soy el agente de registro de proveedores de Periferia IT Group. 
+
+Puedes indicarme un caso de prueba (ej: *Procesa el caso "ec-corp-andina"*) y me encargaré de leer la solicitud, mapear los campos, generar el formulario y armar el paquete para firma.</div>
+        </div>
+      </div>
+
+      <div class="thinking-indicator" id="thinkingIndicator">
+        <div class="spinner"></div>
+        <span>El agente está analizando la solicitud y ejecutando herramientas...</span>
+      </div>
+
+      <div class="chat-input-container">
+        <div class="input-wrapper">
+          <textarea id="userInput" placeholder="Escribe tus instrucciones para el agente..." onkeydown="handleKeyDown(event)"></textarea>
+          <button class="send-btn" onclick="sendMessage()">Enviar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let currentSessionId = `session_${Date.now()}`;
+    let pendingConfirmationCaso = null;
+
+    function selectCase(caso) {
+      const prompt = `Procesa el caso "${caso}". Dime qué campos quedaron llenos, cuáles faltan, si el paquete está listo para firma y qué soportes debo actualizar. No envíes nada todavía.`;
+      document.getElementById('userInput').value = prompt;
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    async function sendMessage(overrideText) {
+      const inputEl = document.getElementById('userInput');
+      const text = overrideText || inputEl.value.trim();
+      if (!text) return;
+
+      if (!overrideText) inputEl.value = '';
+
+      // Render mensaje del usuario
+      appendMessage('user', text);
+
+      // Mostrar spinner
+      showThinking(true);
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            message: text
+          })
+        });
+
+        const data = await response.json();
+        showThinking(false);
+
+        if (!data.ok) {
+          appendMessage('assistant', `⚠️ Error: ${data.error}`);
+          return;
+        }
+
+        currentSessionId = data.sessionId;
+
+        // Renderizar llamada a herramientas y respuesta del asistente
+        appendAssistantTurn(data.reply, data.toolCalls, data.needsConfirmation);
+      } catch (err) {
+        showThinking(false);
+        appendMessage('assistant', `⚠️ Error de conexión con el servidor: ${err.message}`);
+      }
+    }
+
+    function appendMessage(sender, content) {
+      const messagesContainer = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${sender}`;
+
+      const senderDiv = document.createElement('div');
+      senderDiv.className = 'message-sender';
+      senderDiv.textContent = sender === 'user' ? 'Tú' : 'Agente Proveedor';
+
+      const bubbleDiv = document.createElement('div');
+      bubbleDiv.className = 'message-bubble';
+      bubbleDiv.textContent = content;
+
+      msgDiv.appendChild(senderDiv);
+      msgDiv.appendChild(bubbleDiv);
+      messagesContainer.appendChild(msgDiv);
+
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function appendAssistantTurn(reply, toolCalls, needsConfirmation) {
+      const messagesContainer = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message assistant';
+
+      const senderDiv = document.createElement('div');
+      senderDiv.className = 'message-sender';
+      senderDiv.textContent = 'Agente Proveedor';
+
+      const bubbleDiv = document.createElement('div');
+      bubbleDiv.className = 'message-bubble';
+      bubbleDiv.textContent = reply;
+
+      // Si hubo tool calls, renderizar tarjetas de ejecución
+      if (toolCalls && toolCalls.length > 0) {
+        const toolList = document.createElement('div');
+        toolList.className = 'tool-calls-list';
+
+        toolCalls.forEach(tc => {
+          const item = document.createElement('div');
+          item.className = 'tool-call-item';
+          
+          const statusIcon = tc.result && tc.result.ok ? '✅' : '❌';
+          item.innerHTML = `
+            <div class="tool-call-header">
+              <span>🔧 ${tc.name}</span>
+              <span>${statusIcon}</span>
+            </div>
+            <div class="tool-call-args">Argumentos: ${JSON.stringify(tc.args)}</div>
+          `;
+          toolList.appendChild(item);
+        });
+
+        bubbleDiv.appendChild(toolList);
+      }
+
+      // Si requiere confirmación humana, mostrar banner especial
+      if (needsConfirmation) {
+        const banner = document.createElement('div');
+        banner.className = 'confirmation-banner';
+        banner.innerHTML = `
+          <div class="confirmation-title">
+            ⚠️ Confirmación Humana Requerida (RN4 / CA3)
+          </div>
+          <div>El agente ha preparado el paquete y solicita tu aprobación explícita antes de simular el envío al cliente.</div>
+          <div class="confirmation-actions">
+            <button class="btn-confirm" onclick="confirmSend(true)">Sí, confirmar envío</button>
+            <button class="btn-cancel" onclick="confirmSend(false)">No, cancelar</button>
+          </div>
+        `;
+        bubbleDiv.appendChild(banner);
+      }
+
+      msgDiv.appendChild(senderDiv);
+      msgDiv.appendChild(bubbleDiv);
+      messagesContainer.appendChild(msgDiv);
+
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function confirmSend(approved) {
+      if (approved) {
+        sendMessage("Sí, confirmo el envío del paquete. Procede.");
+      } else {
+        sendMessage("No apruebo el envío en este momento. Cancela la acción.");
+      }
+    }
+
+    function showThinking(show) {
+      const el = document.getElementById('thinkingIndicator');
+      el.style.display = show ? 'flex' : 'none';
+    }
+  </script>
+</body>
+</html>
